@@ -174,6 +174,34 @@ sudo npm install -g @anthropic-ai/claude-code
 
 ---
 
+### Conflicto de merge durante el workflow automático
+
+**Causa:** el workflow de GitHub Actions y la máquina local commitean al mismo tiempo, generando un conflicto cuando el workflow intenta hacer push.
+
+**Solución:** al hacer `git pull --rebase`, git se detiene en el conflicto. Para cada archivo en conflicto, aceptá la versión remota y continuá:
+
+```bash
+git checkout --theirs <archivo-en-conflicto>
+git add <archivo-en-conflicto>
+GIT_EDITOR=true git rebase --continue
+```
+
+`git checkout --theirs` acepta la versión del workflow (remota). `GIT_EDITOR=true` evita que se abra vim para editar el mensaje del commit.
+
+---
+
+### Editor vim abre durante `git rebase --continue`
+
+**Causa:** git intenta abrir un editor para que edites el mensaje del commit, y el editor configurado por defecto es vim.
+
+**Solución:** usá `GIT_EDITOR=true` para que git acepte el mensaje del commit sin abrir ningún editor:
+
+```bash
+GIT_EDITOR=true git rebase --continue
+```
+
+---
+
 ### Expusiste una API key en el chat o en un archivo
 
 **Causa:** pegaste o mostraste una key real en una conversación, commit, o log.

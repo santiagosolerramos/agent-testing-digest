@@ -8,8 +8,13 @@ on:
 jobs:
   run-digest:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -25,9 +30,12 @@ jobs:
           LOOKBACK_DAYS: ${{ secrets.LOOKBACK_DAYS }}
         run: python main.py
 
-      - name: Upload report
-        uses: actions/upload-artifact@v4
-        with:
-          name: digest-${{ github.run_id }}
-          path: reports/digest_*.md
-          retention-days: 30
+      - name: Commit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase
+          git add reports/
+          git diff --cached --quiet && exit 0
+          git commit -m "digest: $(date -u '+%Y-%m-%d')"
+          git push

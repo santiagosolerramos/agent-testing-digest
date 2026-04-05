@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `agent-testing-digest` is a daily research tool for an AI PM at Connectly. It automatically searches for new papers, posts, docs, and releases on agent evaluation, LLM testing, regression testing for agents, and synthetic user simulation — and generates a Markdown report with findings relevant to Connectly's context.
 
-**Connectly context:** Connectly builds conversational agents on WhatsApp. They have an internal test framework called Talk Framework that validates agent behavior using simulated personas (test cases with objectives, evaluations, and mock data). The digest is meant to help the team track how the most advanced AI companies approach agent testing and evaluation today.
+**Connectly context:** Connectly builds conversational agents on WhatsApp. They have an internal test framework called Test Framework that validates agent behavior using simulated personas (test cases with objectives, evaluations, and mock data). The digest is meant to help the team track how the most advanced AI companies approach agent testing and evaluation today.
 
 ## Running the digest
 

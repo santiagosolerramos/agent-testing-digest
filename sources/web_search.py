@@ -3,39 +3,28 @@ from datetime import datetime, timezone, timedelta
 from config import LOOKBACK_DAYS, MAX_ITEMS_PER_SOURCE, TAVILY_API_KEY
 from sources.base import SourceItem
 
-QUERIES = [
+GENERAL_QUERIES = [
     "AI agent evaluation framework 2026",
     "LLM testing synthetic users",
     "conversational agent testing",
     "agent regression testing",
     "WhatsApp AI agent evaluation",
-    # Competitor intelligence
-    "Sierra AI agent blog",
-    "Wonderful AI agents blog",
-    "Decagon AI blog",
-    "Intercom AI agent",
-    "Forethought AI",
-    "Parloa AI",
-    "Cognigy AI agent blog",
-    "Yellow.ai conversational agent",
-    "MavenAGI customer support",
-    "PolyAI conversational AI",
-    "Retell AI voice agent",
-    "Kustomer AI agent",
 ]
 
-# Tavily will prioritize results from these domains when used in include_domains
-COMPETITOR_DOMAINS = [
-    "sierra.ai",
-    "wonderful.ai",
-    "decagon.com",
-    "intercom.com",
-    "cognigy.com",
-    "yellow.ai",
-    "mavenagi.com",
-    "kustomer.com",
-    "poly.ai",
-    "retellai.com",
+# (query, domain) — Tavily will restrict results to that domain
+COMPETITOR_QUERIES: list[tuple[str, str]] = [
+    ("Sierra AI agent evaluation 2026", "sierra.ai"),
+    ("Wonderful AI agent release 2026", "wonderful.ai"),
+    ("Decagon AI engineering blog 2026", "decagon.com"),
+    ("Intercom AI agent feature update 2026", "intercom.com"),
+    ("Forethought AI support automation 2026", "forethought.ai"),
+    ("Parloa voice AI agent 2026", "parloa.com"),
+    ("Cognigy AI agent evaluation 2026", "cognigy.com"),
+    ("Yellow.ai conversational AI update 2026", "yellow.ai"),
+    ("MavenAGI customer support AI 2026", "mavenagi.com"),
+    ("PolyAI voice agent release 2026", "poly.ai"),
+    ("Retell AI voice agent update 2026", "retellai.com"),
+    ("Kustomer AI agent automation 2026", "kustomer.com"),
 ]
 
 
@@ -51,8 +40,15 @@ def fetch() -> list[SourceItem]:
     items: list[SourceItem] = []
     seen_urls: set[str] = set()
 
-    for query in QUERIES:
+    for query in GENERAL_QUERIES:
         results = _search(client, query, cutoff)
+        for item in results:
+            if item.url not in seen_urls:
+                seen_urls.add(item.url)
+                items.append(item)
+
+    for query, domain in COMPETITOR_QUERIES:
+        results = _search(client, query, cutoff, include_domain=domain)
         for item in results:
             if item.url not in seen_urls:
                 seen_urls.add(item.url)
@@ -61,17 +57,14 @@ def fetch() -> list[SourceItem]:
     return items[:MAX_ITEMS_PER_SOURCE]
 
 
-def _search(client, query: str, cutoff: datetime) -> list[SourceItem]:
-    is_competitor_query = any(
-        domain.split(".")[0] in query.lower() for domain in COMPETITOR_DOMAINS
-    )
+def _search(client, query: str, cutoff: datetime, include_domain: str | None = None) -> list[SourceItem]:
     kwargs = {
         "query": query,
         "search_depth": "advanced",
         "max_results": 5,
     }
-    if is_competitor_query:
-        kwargs["include_domains"] = COMPETITOR_DOMAINS
+    if include_domain:
+        kwargs["include_domains"] = [include_domain]
 
     try:
         response = client.search(**kwargs)

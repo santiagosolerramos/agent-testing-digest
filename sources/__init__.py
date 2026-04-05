@@ -1,4 +1,4 @@
-from sources import arxiv, hackernews, github_releases, rss
+from sources import arxiv, hackernews, github_releases, rss, web_search
 from sources.base import SourceItem
 
 
@@ -12,6 +12,7 @@ def fetch_all() -> list[SourceItem]:
         ("hackernews", hackernews.fetch),
         ("github", github_releases.fetch),
         ("rss", rss.fetch),
+        ("web_search", web_search.fetch),
     ]
 
     for name, fetch_fn in sources:

@@ -13,6 +13,8 @@ QUERIES = [
     "synthetic user",
     "conversational AI testing",
     "LLM benchmark",
+    "llm testing",
+    "synthetic user simulation",
 ]
 
 

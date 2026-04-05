@@ -14,6 +14,7 @@ PROMPTS_DIR = ROOT_DIR / "prompts"
 # API keys
 XAI_API_KEY: str = os.environ["XAI_API_KEY"]
 GITHUB_TOKEN: str | None = os.getenv("GITHUB_TOKEN")
+TAVILY_API_KEY: str | None = os.getenv("TAVILY_API_KEY")
 
 # Search parameters
 LOOKBACK_DAYS: int = int(os.getenv("LOOKBACK_DAYS", "1"))
@@ -38,6 +39,9 @@ GITHUB_REPOS = [
     "NVIDIA/nemo-guardrails",
     "uptrain-ai/uptrain",
     "trulens/trulens",
+    "pydantic/pydantic-ai",
+    "microsoft/autogen",
+    "crewAIInc/crewAI",
 ]
 
 # RSS feeds to monitor
@@ -49,6 +53,14 @@ RSS_FEEDS = [
     ("LangChain Blog", "https://blog.langchain.dev/rss/"),
     ("Lilian Weng Blog", "https://lilianweng.github.io/index.xml"),
     ("Sebastian Raschka", "https://magazine.sebastianraschka.com/feed"),
+    ("dev.to — llm", "https://dev.to/feed/tag/llm"),
+    ("dev.to — agents", "https://dev.to/feed/tag/agents"),
+    ("dev.to — llmops", "https://dev.to/feed/tag/llmops"),
+    ("Braintrust Blog", "https://www.braintrust.dev/blog/rss.xml"),
+    ("Humanloop Blog", "https://humanloop.com/blog/rss.xml"),
+    # Google Alerts — agregar URLs cuando estén configuradas las alertas:
+    # ("Google Alerts — agent evaluation", "https://www.google.com/alerts/feeds/ID/ID"),
+    # ("Google Alerts — llm testing", "https://www.google.com/alerts/feeds/ID/ID"),
 ]
 
 # Keywords for ranking — tuned to Connectly / Talk Framework context

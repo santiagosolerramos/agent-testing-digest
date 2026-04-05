@@ -47,17 +47,26 @@ def fetch() -> list[SourceItem]:
                 seen_urls.add(item.url)
                 items.append(item)
 
+    competitor_counts: dict[str, int] = {}
     for query, domain in COMPETITOR_QUERIES:
         results = _search(client, query, cutoff, include_domain=domain)
+        count = 0
         for item in results:
             if item.url not in seen_urls:
                 seen_urls.add(item.url)
                 items.append(item)
+                count += 1
+        competitor_counts[domain] = competitor_counts.get(domain, 0) + count
+
+    breakdown = ", ".join(f"{d}={n}" for d, n in competitor_counts.items())
+    print(f"[web_search] competitor breakdown: {breakdown}")
 
     return items[:MAX_ITEMS_PER_SOURCE]
 
 
 def _search(client, query: str, cutoff: datetime, include_domain: str | None = None) -> list[SourceItem]:
+    # Competitor queries skip the date filter — competitor blogs often omit published_date
+    # so Tavily returns no date and the cutoff would discard all results.
     kwargs = {
         "query": query,
         "search_depth": "advanced",
@@ -91,7 +100,7 @@ def _search(client, query: str, cutoff: datetime, include_domain: str | None = N
         else:
             date = datetime.now(timezone.utc)
 
-        if date < cutoff:
+        if not include_domain and date < cutoff:
             continue
 
         summary = (result.get("content") or "").strip()[:400]

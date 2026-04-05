@@ -73,7 +73,7 @@ def score_debug(item: SourceItem) -> tuple[int, list[str]]:
     if item.source == "github":
         score += 1
     if any(domain in item.url for domain in COMPETITOR_DOMAINS):
-        score += 3
+        score += 5
         matched.append(f"competitor domain")
 
     return score, matched
@@ -99,7 +99,7 @@ def _score(item: SourceItem) -> int:
     if item.source == "github":
         score += 1  # Releases from monitored repos are always relevant
     if any(domain in item.url for domain in COMPETITOR_DOMAINS):
-        score += 3  # Competitor content always surfaces above MIN_SCORE
+        score += 5  # Competitor content always surfaces above MIN_SCORE
 
     return score
 

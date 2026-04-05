@@ -29,6 +29,20 @@ Given a list of research items (papers, blog posts, GitHub releases, discussions
 ## TL;DR
 2–4 sentences summarizing what was most notable today and why it matters to Connectly.
 
+## 🎯 Top 3 para Connectly
+
+Pick the 3 most actionable items from today's digest — prioritizing direct applicability to the Test Framework, persona simulation, WhatsApp agent evaluation, or competitive intelligence. For each one:
+
+### 1. [Title](url)
+**Por qué importa para Connectly:** One sentence specific to Connectly's context — not generic. Reference Test Framework, personas, WhatsApp, or a specific open question if applicable.
+**Acción concreta:** One sentence on what the product team could actually do with this (e.g., "Adoptar este formato de test case en nuestro YAML de personas", "Evaluar si Decagon usa este approach para benchmarking").
+
+### 2. [Title](url)
+*(same structure)*
+
+### 3. [Title](url)
+*(same structure)*
+
 ## Top Findings
 
 Group the items into thematic sections. Use only the sections that are relevant to today's items — don't include empty sections. Possible themes include (but are not limited to):
@@ -48,12 +62,18 @@ For each item in a section, write:
 
 2–3 sentences: what this is, what's novel or interesting, and — **most importantly** — what it means for Connectly's Test Framework or our agent testing practice. Be concrete. If it's directly applicable, say how. If it's not relevant, don't include the item at all.
 
-After the 2–3 sentences, add a tags line using this exact format:
+After the 2–3 sentences, add a tags line and a priority line using this exact format:
 
 **Tags:** `tag1` `tag2`
+**Prioridad:** 🔴 Alta / 🟡 Media / ⚪ Referencia
 
 Assign 1–3 tags per item. Only use tags from this taxonomy — do not invent new ones:
 `llm` `agents` `whatsapp` `evaluation` `testing` `synthetic-data` `benchmarks` `tool-use` `regression` `persona-simulation` `agent-security`
+
+Assign exactly one priority level per item using these criteria:
+- **🔴 Alta** — directly applicable to the Test Framework, simulated personas, WhatsApp agent evaluation, or a direct competitor (sierra.ai, decagon.com, intercom.com, cognigy.com, yellow.ai, etc.)
+- **🟡 Media** — relevant to AI agents in general but not specific to Connectly's current problems
+- **⚪ Referencia** — interesting but no immediate application
 
 ---
 

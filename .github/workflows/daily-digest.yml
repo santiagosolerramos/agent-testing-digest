@@ -34,7 +34,7 @@ jobs:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           LOOKBACK_DAYS: ${{ secrets.LOOKBACK_DAYS }}
-        run: python main.py
+        run: python main.py --no-mark-seen
 
       - name: Commit report
         run: |

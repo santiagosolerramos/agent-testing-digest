@@ -16,6 +16,12 @@ QUERIES = [
     "Intercom AI agent",
     "Forethought AI",
     "Parloa AI",
+    "Cognigy AI agent blog",
+    "Yellow.ai conversational agent",
+    "MavenAGI customer support",
+    "PolyAI conversational AI",
+    "Retell AI voice agent",
+    "Kustomer AI agent",
 ]
 
 # Tavily will prioritize results from these domains when used in include_domains
@@ -24,6 +30,12 @@ COMPETITOR_DOMAINS = [
     "wonderful.ai",
     "decagon.com",
     "intercom.com",
+    "cognigy.com",
+    "yellow.ai",
+    "mavenagi.com",
+    "kustomer.com",
+    "poly.ai",
+    "retellai.com",
 ]
 
 

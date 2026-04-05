@@ -15,6 +15,14 @@ COMPETITOR_DOMAINS = [
     "hamming.ai",
     "braintrust.dev",
     "humanloop.com",
+    "cognigy.com",
+    "yellow.ai",
+    "mavenagi.com",
+    "kustomer.com",
+    "poly.ai",
+    "retellai.com",
+    "moveworks.com",
+    "kore.ai",
 ]
 
 

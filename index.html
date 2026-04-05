@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Testing Digest</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fafaf9;
+      --surface: #ffffff;
+      --border: #e5e5e3;
+      --text: #1a1a18;
+      --text-muted: #6b6b67;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --sidebar-width: 260px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    header span {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 32px 64px;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    /* ── Sidebar ── */
+    aside {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: 88px;
+    }
+
+    aside h2 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    /* ── Tag filters ── */
+    #tag-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+
+    #tag-filters button {
+      font-size: 11px;
+      font-family: inherit;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.1s;
+      white-space: nowrap;
+    }
+
+    #tag-filters button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    #tag-filters button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    /* ── Digest list ── */
+    #digest-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    #digest-list li a {
+      display: block;
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text);
+      font-size: 14px;
+      transition: background 0.1s;
+    }
+
+    #digest-list li a:hover {
+      background: var(--border);
+    }
+
+    #digest-list li a.active {
+      background: #eff6ff;
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    #digest-list li a .date {
+      display: block;
+      font-size: 13px;
+    }
+
+    #digest-list li a .label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    #digest-list li.hidden {
+      display: none;
+    }
+
+    #no-results {
+      display: none;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 8px 12px;
+    }
+
+    /* ── Main content ── */
+    main {
+      flex: 1;
+      min-width: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 40px 48px;
+    }
+
+    /* ── States ── */
+    .state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 320px;
+      gap: 10px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .state .icon { font-size: 32px; line-height: 1; }
+    .state p { font-size: 14px; max-width: 280px; line-height: 1.5; }
+    .state .hint { font-size: 12px; opacity: 0.7; }
+
+    /* ── Markdown rendering ── */
+    #content h1 { font-size: 24px; font-weight: 700; margin-bottom: 20px; letter-spacing: -0.02em; line-height: 1.3; }
+    #content h2 { font-size: 18px; font-weight: 600; margin-top: 36px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); letter-spacing: -0.01em; }
+    #content h3 { font-size: 15px; font-weight: 600; margin-top: 24px; margin-bottom: 8px; }
+    #content p  { font-size: 15px; line-height: 1.7; color: #2d2d2b; margin-bottom: 14px; }
+    #content ul, #content ol { padding-left: 20px; margin-bottom: 14px; }
+    #content li { font-size: 15px; line-height: 1.7; color: #2d2d2b; margin-bottom: 4px; }
+    #content a  { color: var(--accent); text-decoration: none; }
+    #content a:hover { text-decoration: underline; }
+    #content strong { font-weight: 600; color: var(--text); }
+    #content code { font-family: "SF Mono", "Fira Code", monospace; font-size: 13px; background: #f3f4f6; padding: 1px 5px; border-radius: 4px; }
+    #content pre  { background: #f3f4f6; padding: 16px; border-radius: 8px; overflow-x: auto; margin-bottom: 16px; }
+    #content pre code { background: none; padding: 0; font-size: 13px; }
+    #content blockquote { border-left: 3px solid var(--border); padding-left: 16px; margin: 16px 0; color: var(--text-muted); }
+    #content hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Agent Testing Digest</h1>
+  <span>— Connectly</span>
+</header>
+
+<div class="layout">
+  <aside>
+    <h2>Filtrar por tag</h2>
+    <div id="tag-filters"><p class="hint" style="font-size:11px;color:var(--text-muted)">Cargando…</p></div>
+
+    <h2>Digests</h2>
+    <ul id="digest-list">
+      <li><div style="padding:8px 12px;font-size:12px;color:var(--text-muted)">Cargando…</div></li>
+    </ul>
+    <p id="no-results">Sin resultados para este tag.</p>
+  </aside>
+
+  <main>
+    <div id="content">
+      <div class="state">
+        <div class="icon">📋</div>
+        <p>Seleccioná un digest de la lista para leerlo.</p>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const REPO    = "santiagosolerramos/agent-testing-digest";
+  const BRANCH  = "main";
+  const API_URL = `https://api.github.com/repos/${REPO}/contents/reports`;
+  const RAW_URL = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/reports`;
+
+  const listEl     = document.getElementById("digest-list");
+  const filtersEl  = document.getElementById("tag-filters");
+  const noResults  = document.getElementById("no-results");
+  const content    = document.getElementById("content");
+
+  let activeTag    = null;
+  let allDigests   = [];   // [{ name, date, tags, li, linkEl }]
+
+  // ── Frontmatter parser ──────────────────────────────────────────────────
+  // Extracts tags from YAML frontmatter at the top of a markdown file.
+  // Handles: tags: [evaluation, testing, agents]
+  function parseTags(text) {
+    if (!text.startsWith("---")) return [];
+    const close = text.indexOf("\n---", 3);
+    if (close === -1) return [];
+    const yaml = text.slice(3, close);
+    const m = yaml.match(/tags:\s*\[([^\]]+)\]/);
+    if (!m) return [];
+    return m[1].split(",").map(t => t.trim().replace(/['"]/g, "")).filter(Boolean);
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+  function dateFromFilename(name) {
+    const m = name.match(/digest_(\d{4}-\d{2}-\d{2})\.md$/);
+    return m ? m[1] : null;
+  }
+
+  function formatDate(iso) {
+    const [y, m, d] = iso.split("-");
+    const months = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+    return `${parseInt(d)} ${months[parseInt(m) - 1]} ${y}`;
+  }
+
+  function setLoading() {
+    content.innerHTML = `<div class="state"><div class="icon">⏳</div><p class="hint">Cargando digest…</p></div>`;
+  }
+
+  function setError(msg) {
+    content.innerHTML = `<div class="state"><div class="icon">⚠️</div><p>${msg}</p></div>`;
+  }
+
+  // ── Load and render a digest ─────────────────────────────────────────────
+  async function loadDigest(filename, linkEl) {
+    document.querySelectorAll("#digest-list a").forEach(a => a.classList.remove("active"));
+    linkEl.classList.add("active");
+    setLoading();
+
+    try {
+      const res = await fetch(`${RAW_URL}/${filename}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const md = await res.text();
+      // Strip frontmatter before rendering so --- blocks don't appear as content
+      const body = md.startsWith("---") ? md.replace(/^---[\s\S]*?\n---\n?/, "") : md;
+      content.innerHTML = marked.parse(body);
+    } catch (e) {
+      setError(`No se pudo cargar el digest. ${e.message}`);
+    }
+  }
+
+  // ── Tag filter logic ─────────────────────────────────────────────────────
+  function applyFilter(tag) {
+    activeTag = tag;
+
+    // Update button states
+    filtersEl.querySelectorAll("button").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.tag === (tag ?? ""));
+    });
+
+    let visible = 0;
+    allDigests.forEach(d => {
+      const show = tag === null || d.tags.includes(tag);
+      d.li.classList.toggle("hidden", !show);
+      if (show) visible++;
+    });
+
+    noResults.style.display = visible === 0 ? "block" : "none";
+  }
+
+  function buildTagFilters(tags) {
+    filtersEl.innerHTML = "";
+
+    const all = document.createElement("button");
+    all.textContent = "Todos";
+    all.dataset.tag = "";
+    all.classList.add("active");
+    all.addEventListener("click", () => applyFilter(null));
+    filtersEl.appendChild(all);
+
+    [...tags].sort().forEach(tag => {
+      const btn = document.createElement("button");
+      btn.textContent = tag;
+      btn.dataset.tag = tag;
+      btn.addEventListener("click", () => applyFilter(tag));
+      filtersEl.appendChild(btn);
+    });
+  }
+
+  // ── Main loader ──────────────────────────────────────────────────────────
+  async function loadList() {
+    try {
+      const res = await fetch(API_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const files = await res.json();
+
+      const digestFiles = files
+        .filter(f => f.name.match(/^digest_\d{4}-\d{2}-\d{2}\.md$/))
+        .map(f => ({ name: f.name, date: dateFromFilename(f.name) }))
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+      if (digestFiles.length === 0) {
+        listEl.innerHTML = `<li><div class="state" style="min-height:80px;"><p>Todavía no hay digests generados.</p></div></li>`;
+        filtersEl.innerHTML = "";
+        content.innerHTML = `<div class="state"><div class="icon">📭</div><p>Todavía no hay digests disponibles. Corré el pipeline para generar el primero.</p></div>`;
+        return;
+      }
+
+      // Fetch all frontmatters in parallel to extract tags
+      const frontmatters = await Promise.all(
+        digestFiles.map(d =>
+          fetch(`${RAW_URL}/${d.name}`)
+            .then(r => r.ok ? r.text() : "")
+            .catch(() => "")
+        )
+      );
+
+      // Build digest entries with tags
+      listEl.innerHTML = "";
+      const allTags = new Set();
+
+      digestFiles.forEach((d, i) => {
+        const tags = parseTags(frontmatters[i]);
+        tags.forEach(t => allTags.add(t));
+
+        const li = document.createElement("li");
+        const a  = document.createElement("a");
+        a.href = "#";
+        const label = i === 0 ? `<span class="label">más reciente · ${d.date}</span>` : `<span class="label">${d.date}</span>`;
+        a.innerHTML = `<span class="date">${formatDate(d.date)}</span>${label}`;
+        a.addEventListener("click", e => { e.preventDefault(); loadDigest(d.name, a); });
+        li.appendChild(a);
+        listEl.appendChild(li);
+
+        allDigests.push({ name: d.name, date: d.date, tags, li, linkEl: a });
+      });
+
+      buildTagFilters(allTags);
+
+      // Auto-load most recent
+      loadDigest(allDigests[0].name, allDigests[0].linkEl);
+
+    } catch (e) {
+      listEl.innerHTML = `<li><div style="padding:8px 12px;font-size:12px;color:var(--text-muted)">Error al cargar la lista.</div></li>`;
+      filtersEl.innerHTML = "";
+      setError(`No se pudo conectar con la API de GitHub.<br><br><small>${e.message}</small>`);
+    }
+  }
+
+  loadList();
+</script>
+</body>
+</html>

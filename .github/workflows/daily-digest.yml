@@ -34,6 +34,7 @@ jobs:
           XAI_API_KEY: ${{ secrets.XAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           LOOKBACK_DAYS: ${{ secrets.LOOKBACK_DAYS }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
         run: python main.py --no-mark-seen
 
       - name: Commit report

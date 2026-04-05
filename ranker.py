@@ -4,6 +4,19 @@ from pathlib import Path
 from config import HIGH_VALUE_KEYWORDS, MEDIUM_VALUE_KEYWORDS, MIN_SCORE, SEEN_URLS_FILE
 from sources.base import SourceItem
 
+COMPETITOR_DOMAINS = [
+    "sierra.ai",
+    "wonderful.ai",
+    "decagon.com",
+    "intercom.com",
+    "forethought.ai",
+    "parloa.com",
+    "brainlid.org",
+    "hamming.ai",
+    "braintrust.dev",
+    "humanloop.com",
+]
+
 
 def rank_and_filter(items: list[SourceItem]) -> list[SourceItem]:
     """Score items by relevance, filter by MIN_SCORE, remove already-seen URLs."""
@@ -51,6 +64,9 @@ def score_debug(item: SourceItem) -> tuple[int, list[str]]:
         score += 1
     if item.source == "github":
         score += 1
+    if any(domain in item.url for domain in COMPETITOR_DOMAINS):
+        score += 3
+        matched.append(f"competitor domain")
 
     return score, matched
 
@@ -74,6 +90,8 @@ def _score(item: SourceItem) -> int:
         score += 1
     if item.source == "github":
         score += 1  # Releases from monitored repos are always relevant
+    if any(domain in item.url for domain in COMPETITOR_DOMAINS):
+        score += 3  # Competitor content always surfaces above MIN_SCORE
 
     return score
 

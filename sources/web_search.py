@@ -9,6 +9,21 @@ QUERIES = [
     "conversational agent testing",
     "agent regression testing",
     "WhatsApp AI agent evaluation",
+    # Competitor intelligence
+    "Sierra AI agent blog",
+    "Wonderful AI agents blog",
+    "Decagon AI blog",
+    "Intercom AI agent",
+    "Forethought AI",
+    "Parloa AI",
+]
+
+# Tavily will prioritize results from these domains when used in include_domains
+COMPETITOR_DOMAINS = [
+    "sierra.ai",
+    "wonderful.ai",
+    "decagon.com",
+    "intercom.com",
 ]
 
 
@@ -35,12 +50,19 @@ def fetch() -> list[SourceItem]:
 
 
 def _search(client, query: str, cutoff: datetime) -> list[SourceItem]:
+    is_competitor_query = any(
+        domain.split(".")[0] in query.lower() for domain in COMPETITOR_DOMAINS
+    )
+    kwargs = {
+        "query": query,
+        "search_depth": "advanced",
+        "max_results": 5,
+    }
+    if is_competitor_query:
+        kwargs["include_domains"] = COMPETITOR_DOMAINS
+
     try:
-        response = client.search(
-            query=query,
-            search_depth="advanced",
-            max_results=5,
-        )
+        response = client.search(**kwargs)
     except Exception as e:
         print(f"[web_search] error for query '{query}': {e}")
         return []

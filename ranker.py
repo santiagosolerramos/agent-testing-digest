@@ -1,7 +1,7 @@
-import json
+import re
 from pathlib import Path
 
-from config import HIGH_VALUE_KEYWORDS, MEDIUM_VALUE_KEYWORDS, MIN_SCORE, SEEN_URLS_FILE
+from config import HIGH_VALUE_KEYWORDS, MEDIUM_VALUE_KEYWORDS, MIN_SCORE, REPORTS_DIR
 from sources.base import SourceItem
 
 COMPETITOR_DOMAINS = [
@@ -40,14 +40,6 @@ def rank_and_filter(items: list[SourceItem]) -> list[SourceItem]:
 
     scored.sort(key=lambda x: (x.score, x.date), reverse=True)
     return scored
-
-
-def mark_seen(items: list[SourceItem]) -> None:
-    """Persist URLs so they are skipped in future runs."""
-    seen = _load_seen_urls()
-    seen.update(item.url for item in items)
-    SEEN_URLS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    SEEN_URLS_FILE.write_text(json.dumps(list(seen), indent=2))
 
 
 def score_debug(item: SourceItem) -> tuple[int, list[str]]:
@@ -105,10 +97,9 @@ def _score(item: SourceItem) -> int:
 
 
 def _load_seen_urls() -> set[str]:
-    if not Path(SEEN_URLS_FILE).exists():
-        return set()
-    try:
-        data = json.loads(Path(SEEN_URLS_FILE).read_text())
-        return set(data)
-    except (json.JSONDecodeError, TypeError):
-        return set()
+    """Extract all URLs previously published in digest reports."""
+    seen: set[str] = set()
+    for report in sorted(Path(REPORTS_DIR).glob("digest_*.md")):
+        text = report.read_text(encoding="utf-8")
+        seen.update(re.findall(r"\]\((https?://[^)]+)\)", text))
+    return seen

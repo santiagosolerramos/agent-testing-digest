@@ -36,7 +36,7 @@ jobs:
           LOOKBACK_DAYS: ${{ secrets.LOOKBACK_DAYS }}
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           MIN_SCORE: ${{ secrets.MIN_SCORE }}
-        run: python main.py --no-mark-seen
+        run: python main.py
 
       - name: Commit report
         run: |

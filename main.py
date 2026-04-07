@@ -4,9 +4,8 @@ agent-testing-digest
 Daily research digest on agent evaluation & LLM testing for Connectly.
 
 Usage:
-    python main.py                 # Run for today
+    python main.py                    # Run for today
     python main.py --date 2024-01-15  # Run for a specific date (fetch window unchanged)
-    python main.py --no-mark-seen  # Don't persist seen URLs (useful for testing)
 """
 
 import argparse
@@ -19,7 +18,7 @@ from pathlib import Path
 
 from config import REPORTS_DIR, XAI_API_KEY, GITHUB_TOKEN, LOOKBACK_DAYS, MIN_SCORE, MAX_ITEMS_PER_SOURCE
 from sources import fetch_all
-from ranker import rank_and_filter, mark_seen, score_debug
+from ranker import rank_and_filter, score_debug
 from renderer import render
 
 _STOPWORDS = {
@@ -70,11 +69,6 @@ def main():
     report_path.write_text(digest, encoding="utf-8")
     print(f"\nDigest written to: {report_path}")
 
-    # 6. Persist seen URLs
-    if not args.no_mark_seen and ranked:
-        mark_seen(ranked)
-        print(f"Marked {len(ranked)} URLs as seen.\n")
-
     print(digest)
 
 
@@ -85,11 +79,6 @@ def _parse_args() -> argparse.Namespace:
         type=date.fromisoformat,
         default=None,
         help="Report date in YYYY-MM-DD format (default: today)",
-    )
-    parser.add_argument(
-        "--no-mark-seen",
-        action="store_true",
-        help="Skip persisting seen URLs (useful for re-running without skipping items)",
     )
     parser.add_argument(
         "--debug",
